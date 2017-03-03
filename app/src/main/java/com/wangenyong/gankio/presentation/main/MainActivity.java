@@ -13,6 +13,7 @@ import com.wangenyong.gankio.R;
 import com.wangenyong.gankio.di.component.AppComponent;
 import com.wangenyong.gankio.presentation.base.AppActivity;
 import com.wangenyong.gankio.presentation.gank.GankFragment;
+import com.wangenyong.gankio.presentation.girls.GirlsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,9 @@ public class MainActivity extends AppActivity {
 
         List<Fragment> fragments = new ArrayList<>(4);
         fragments.add(new GankFragment());
-        fragments.add(new GankFragment());
-        fragments.add(new GankFragment());
-        fragments.add(new GankFragment());
+        fragments.add(new GirlsFragment());
+        fragments.add(new GirlsFragment());
+        fragments.add(new GirlsFragment());
 
         mFragNavController = new FragNavController(savedInstanceState, getSupportFragmentManager(), R.id.contentContainer, fragments, TAB_TODAY);
 
