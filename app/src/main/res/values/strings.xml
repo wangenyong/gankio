@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">GankIO</string>
+    
+    
+    <string name="tab_gank">干货</string>
+    <string name="tab_today">今日</string>
+    <string name="tab_girls">福利</string>
+    <string name="tab_my">我的</string>
 </resources>

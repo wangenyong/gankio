@@ -11,6 +11,9 @@ import com.wangenyong.gankio.di.component.AppComponent;
 
 public abstract class AppFragment<P extends Presenter> extends BaseFragment<P> {
     protected AppApplication mAppApplication;
+    protected boolean isVisible = false;
+    protected boolean isViewPrepared = false;
+    protected boolean isDataLoaded = false;
 
     @Override
     protected void ComponentInject() {
@@ -19,6 +22,24 @@ public abstract class AppFragment<P extends Presenter> extends BaseFragment<P> {
     }
 
     protected abstract void setupFragmentComponent(AppComponent appComponent);
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(getUserVisibleHint()) {
+            isVisible = true;
+            onVisible();
+        } else {
+            isVisible = false;
+            onInvisible();
+        }
+    }
+
+    protected void onVisible(){
+        lazyLoad();
+    }
+    protected abstract void lazyLoad();
+    protected void onInvisible(){}
 
     @Override
     public void onDestroy() {

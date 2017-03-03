@@ -37,6 +37,8 @@ dependencies {
     compile 'com.google.dagger:dagger:2.8'
     compile 'me.drakeet.multitype:multitype:2.4.2'
     compile 'com.github.bassaer:materialdesigncolors:1.0.0'
+    compile 'com.roughike:bottom-bar:2.1.1'
+    compile 'com.ncapdevi:frag-nav:1.4.0'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'

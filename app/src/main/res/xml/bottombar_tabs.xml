@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Tabs>
+    <tab
+        id="@+id/tab_gank"
+        icon="@drawable/ic_tab_gank"
+        title="@string/tab_gank" />
+    <tab
+        id="@+id/tab_today"
+        icon="@drawable/ic_tab_today"
+        title="@string/tab_today" />
+    <tab
+        id="@+id/tab_girls"
+        icon="@drawable/ic_tab_girls"
+        title="@string/tab_girls" />
+    <tab
+        id="@+id/tab_my"
+        icon="@drawable/ic_tab_my"
+        title="@string/tab_my" />
+</Tabs>
