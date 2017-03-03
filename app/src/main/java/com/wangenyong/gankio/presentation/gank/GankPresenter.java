@@ -6,10 +6,19 @@ import com.jess.arms.base.AppManager;
 import com.jess.arms.di.scope.ActivityScope;
 import com.jess.arms.mvp.BasePresenter;
 import com.jess.arms.widget.imageloader.ImageLoader;
+import com.wangenyong.gankio.model.entity.Gank;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import me.drakeet.multitype.MultiTypeAdapter;
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 
 /**
@@ -33,6 +42,9 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
     private ImageLoader mImageLoader;
     private AppManager mAppManager;
 
+    private MultiTypeAdapter mAdapter;
+    private List<Object> mGanks = new ArrayList<>();
+
     @Inject
     public GankPresenter(GankContract.Model model, GankContract.View rootView
             , RxErrorHandler handler, Application application
@@ -42,6 +54,26 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
         this.mApplication = application;
         this.mImageLoader = imageLoader;
         this.mAppManager = appManager;
+
+        mAdapter = new MultiTypeAdapter();
+        mAdapter.register(Gank.class, new GankItemViewProvider());
+        mRootView.setAdapter(mAdapter);
+    }
+
+    public void requestGanks(final boolean pullToRefresh) {
+        Subscription subscription = mModel.getGanks("Android", 10, 1, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Gank>>() {
+                    @Override
+                    public void call(List<Gank> ganks) {
+                        for (Gank gank: ganks) {
+                            mGanks.add(gank);
+                        }
+                        mAdapter.setItems(mGanks);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     @Override

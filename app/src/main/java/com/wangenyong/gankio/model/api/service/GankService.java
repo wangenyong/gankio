@@ -14,6 +14,6 @@ import rx.Observable;
  */
 
 public interface GankService {
-    @GET("/data/{type}/{count}/{page}")
+    @GET("data/{type}/{count}/{page}")
     Observable<BaseJson<List<Gank>>> getGanks(@Path("type") String type, @Path("count") int count, @Path("page") int page);
 }

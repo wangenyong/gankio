@@ -6,6 +6,7 @@ import com.wangenyong.gankio.model.entity.Gank;
 
 import java.util.List;
 
+import me.drakeet.multitype.MultiTypeAdapter;
 import rx.Observable;
 
 
@@ -25,7 +26,7 @@ import rx.Observable;
 public interface GankContract {
     //对于经常使用的关于UI的方法可以定义到BaseView中,如显示隐藏进度条,和显示文字消息
     interface View extends BaseView {
-
+        void setAdapter(MultiTypeAdapter adapter);
     }
 
     //Model层定义接口,外部只需关心model返回的数据,无需关心内部细节,及是否使用缓存

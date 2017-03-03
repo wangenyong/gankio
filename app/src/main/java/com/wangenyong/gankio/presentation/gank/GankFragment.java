@@ -2,6 +2,9 @@ package com.wangenyong.gankio.presentation.gank;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,9 @@ import com.wangenyong.gankio.di.component.AppComponent;
 import com.wangenyong.gankio.di.component.DaggerGankComponent;
 import com.wangenyong.gankio.di.module.GankModule;
 import com.wangenyong.gankio.presentation.base.AppFragment;
+
+import butterknife.BindView;
+import me.drakeet.multitype.MultiTypeAdapter;
 
 import static com.jess.arms.utils.Preconditions.checkNotNull;
 
@@ -30,6 +36,8 @@ import static com.jess.arms.utils.Preconditions.checkNotNull;
 
 public class GankFragment extends AppFragment<GankPresenter> implements GankContract.View {
 
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mRefreshLayout;
+    @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
 
     public static GankFragment newInstance() {
         GankFragment fragment = new GankFragment();
@@ -51,14 +59,23 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
         return inflater.inflate(R.layout.fragment_gank, container, false);
     }
 
+    private void initRecycleView() {
+        UiUtils.configRecycleView(mRecyclerView, new LinearLayoutManager(mActivity));
+    }
+
     @Override
     protected void initData() {
-
+        mPresenter.requestGanks(true);
     }
 
     @Override
     public void lazyLoad() {}
 
+    @Override
+    public void setAdapter(MultiTypeAdapter adapter) {
+        mRecyclerView.setAdapter(adapter);
+        initRecycleView();
+    }
 
     /**
      * 此方法是让外部调用使fragment做一些操作的,比如说外部的activity想让fragment对象执行一些方法,
