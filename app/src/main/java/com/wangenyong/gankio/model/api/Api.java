@@ -5,5 +5,5 @@ package com.wangenyong.gankio.model.api;
  */
 
 public interface Api {
-    String APP_DOMAIN = "https://api.github.com";
+    String APP_DOMAIN = "http://gank.io/api";
 }

@@ -1,6 +1,6 @@
 package com.wangenyong.gankio.di.module;
 
-import com.wangenyong.gankio.model.api.service.TechService;
+import com.wangenyong.gankio.model.api.service.GankService;
 
 import javax.inject.Singleton;
 
@@ -17,7 +17,7 @@ public class ServiceModule {
 
     @Singleton
     @Provides
-    TechService provideTechService(Retrofit retrofit) {
-        return retrofit.create(TechService.class);
+    GankService provideGankService(Retrofit retrofit) {
+        return retrofit.create(GankService.class);
     }
 }

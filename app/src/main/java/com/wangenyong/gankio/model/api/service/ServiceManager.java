@@ -11,15 +11,15 @@ import javax.inject.Singleton;
 
 @Singleton
 public class ServiceManager implements BaseServiceManager {
-    private TechService mTechService;
+    private GankService mGankService;
 
     @Inject
-    public ServiceManager(TechService techService) {
-        mTechService = techService;
+    public ServiceManager(GankService gankService) {
+        mGankService = gankService;
     }
 
-    public TechService getTechService() {
-        return mTechService;
+    public GankService getGankService() {
+        return mGankService;
     }
 
     @Override

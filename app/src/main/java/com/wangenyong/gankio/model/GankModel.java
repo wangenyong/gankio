@@ -7,9 +7,20 @@ import com.jess.arms.di.scope.ActivityScope;
 import com.jess.arms.mvp.BaseModel;
 import com.wangenyong.gankio.model.api.cache.CacheManager;
 import com.wangenyong.gankio.model.api.service.ServiceManager;
+import com.wangenyong.gankio.model.entity.ApiException;
+import com.wangenyong.gankio.model.entity.BaseJson;
+import com.wangenyong.gankio.model.entity.Gank;
 import com.wangenyong.gankio.presentation.gank.GankContract;
 
+import java.util.List;
+
 import javax.inject.Inject;
+
+import io.rx_cache.DynamicKeyGroup;
+import io.rx_cache.EvictProvider;
+import io.rx_cache.Reply;
+import rx.Observable;
+import rx.functions.Func1;
 
 
 /**
@@ -35,6 +46,29 @@ public class GankModel extends BaseModel<ServiceManager, CacheManager> implement
         super(serviceManager, cacheManager);
         this.mGson = gson;
         this.mApplication = application;
+    }
+
+    @Override
+    public Observable<List<Gank>> getGanks(String type, int count, int page, boolean update) {
+        Observable<List<Gank>> ganks = mServiceManager.getGankService()
+                .getGanks(type, count, page)
+                .map(new Func1<BaseJson<List<Gank>>, List<Gank>>() {
+                    @Override
+                    public List<Gank> call(BaseJson<List<Gank>> listBaseJson) {
+                        if (listBaseJson.isError()) {
+                            throw new ApiException("Returned data error!");
+                        }
+                        return listBaseJson.getResults();
+                    }
+                });
+        return mCacheManager.getCommonCache()
+                .getGanks(ganks, new DynamicKeyGroup(page, type), new EvictProvider(update))
+                .map(new Func1<Reply<List<Gank>>, List<Gank>>() {
+                    @Override
+                    public List<Gank> call(Reply<List<Gank>> listReply) {
+                        return listReply.getData();
+                    }
+                });
     }
 
     @Override
