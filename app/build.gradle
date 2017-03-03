@@ -33,6 +33,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile project(path: ':arms')
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.google.dagger:dagger:2.8'
     compile 'me.drakeet.multitype:multitype:2.4.2'
@@ -40,11 +41,11 @@ dependencies {
     compile 'com.roughike:bottom-bar:2.1.1'
     compile 'com.ncapdevi:frag-nav:1.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    compile 'com.android.support:support-v4:25.2.0'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-    compile project(path: ':arms')
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 }

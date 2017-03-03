@@ -12,7 +12,7 @@ import com.roughike.bottombar.OnTabSelectListener;
 import com.wangenyong.gankio.R;
 import com.wangenyong.gankio.di.component.AppComponent;
 import com.wangenyong.gankio.presentation.base.AppActivity;
-import com.wangenyong.gankio.presentation.gank.GankFragment;
+import com.wangenyong.gankio.presentation.gank.GankFragmentContainer;
 import com.wangenyong.gankio.presentation.girls.GirlsFragment;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class MainActivity extends AppActivity {
         super.onCreate(savedInstanceState);
 
         List<Fragment> fragments = new ArrayList<>(4);
-        fragments.add(new GankFragment());
+        fragments.add(new GankFragmentContainer());
         fragments.add(new GirlsFragment());
         fragments.add(new GirlsFragment());
         fragments.add(new GirlsFragment());
