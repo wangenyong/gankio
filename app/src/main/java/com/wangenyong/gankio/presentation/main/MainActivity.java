@@ -1,30 +1,22 @@
 package com.wangenyong.gankio.presentation.main;
 
-import android.view.LayoutInflater;
-import android.view.View;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
 import com.roughike.bottombar.BottomBar;
 import com.wangenyong.gankio.R;
-import com.wangenyong.gankio.di.component.AppComponent;
-import com.wangenyong.gankio.presentation.base.AppActivity;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
-public class MainActivity extends AppActivity {
+public class MainActivity extends AppCompatActivity {
     @BindView(R.id.bottomBar) BottomBar mBottomBar;
 
     @Override
-    protected void setupActivityComponent(AppComponent appComponent) {
-
-    }
-
-    @Override
-    protected View initView() {
-        return LayoutInflater.from(this).inflate(R.layout.activity_main, null, false);
-    }
-
-    @Override
-    protected void initData() {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
     }
 }
