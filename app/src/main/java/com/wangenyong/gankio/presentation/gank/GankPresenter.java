@@ -6,6 +6,7 @@ import com.jess.arms.base.AppManager;
 import com.jess.arms.di.scope.ActivityScope;
 import com.jess.arms.mvp.BasePresenter;
 import com.jess.arms.utils.PermissionUtil;
+import com.jess.arms.utils.RxUtils;
 import com.jess.arms.widget.imageloader.ImageLoader;
 import com.wangenyong.gankio.model.entity.Gank;
 
@@ -17,8 +18,10 @@ import javax.inject.Inject;
 import me.drakeet.multitype.MultiTypeAdapter;
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
 import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber;
+import me.jessyan.rxerrorhandler.handler.RetryWithDelay;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 
 
@@ -75,10 +78,39 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
 
         Subscription subscription = mModel.getGanks(type, mCount, mPage, pullToRefresh)
                 .subscribeOn(Schedulers.io())
+                .retryWhen(new RetryWithDelay(3, 2))
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        if (pullToRefresh) {
+                            mRootView.showLoading();
+                        } else {
+                            mRootView.startLoadMore();
+                        }
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doAfterTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        if (pullToRefresh) {
+                            mRootView.hideLoading();
+                        } else {
+                            mRootView.endLoadMore();
+                        }
+                    }
+                })
+                .compose(RxUtils.<List<Gank>>bindToLifecycle(mRootView))
                 .subscribe(new ErrorHandleSubscriber<List<Gank>>(mErrorHandler) {
                     @Override
                     public void onNext(List<Gank> ganks) {
+                        if (pullToRefresh) {
+                            mGanks.clear();
+                            mPage = 1;
+                        } else {
+                            mPage++;
+                        }
                         for (Gank gank: ganks) {
                             mGanks.add(gank);
                         }
@@ -86,6 +118,7 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
                         mAdapter.notifyDataSetChanged();
                     }
                 });
+        addSubscribe(subscription);
     }
 
 

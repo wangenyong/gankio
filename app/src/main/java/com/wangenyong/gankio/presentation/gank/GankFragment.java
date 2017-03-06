@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jess.arms.utils.UiUtils;
+import com.paginate.Paginate;
 import com.tbruyelle.rxpermissions.RxPermissions;
 import com.wangenyong.gankio.R;
 import com.wangenyong.gankio.di.component.AppComponent;
@@ -36,7 +37,7 @@ import static com.jess.arms.utils.Preconditions.checkNotNull;
  * Created by wangenyong on 2017/3/3.
  */
 
-public class GankFragment extends AppFragment<GankPresenter> implements GankContract.View {
+public class GankFragment extends AppFragment<GankPresenter> implements GankContract.View, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
@@ -46,6 +47,8 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     private String mTitle;
 
     RxPermissions mRxPermissions;
+    private boolean isLoadingMore;
+    private Paginate mPaginate;
 
     public static GankFragment newInstance(String title) {
         GankFragment fragment = new GankFragment();
@@ -76,11 +79,17 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     }
 
     private void initRecycleView() {
+        mRefreshLayout.setOnRefreshListener(this);
         UiUtils.configRecycleView(mRecyclerView, new LinearLayoutManager(mActivity));
     }
 
     @Override
     protected void initData() {
+        mPresenter.requestGanks(mTitle, true);
+    }
+
+    @Override
+    public void onRefresh() {
         mPresenter.requestGanks(mTitle, true);
     }
 
@@ -91,6 +100,7 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     public void setAdapter(MultiTypeAdapter adapter) {
         mRecyclerView.setAdapter(adapter);
         initRecycleView();
+        initPaginate();
     }
 
     @Override
@@ -119,12 +129,12 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
 
     @Override
     public void showLoading() {
-
+        mRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void hideLoading() {
-
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -137,6 +147,41 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     public void launchActivity(@NonNull Intent intent) {
         checkNotNull(intent);
         UiUtils.startActivity(intent);
+    }
+
+    @Override
+    public void startLoadMore() {
+        isLoadingMore = true;
+    }
+
+    @Override
+    public void endLoadMore() {
+        isLoadingMore = false;
+    }
+
+    private void initPaginate() {
+        if (mPaginate == null) {
+            Paginate.Callbacks callbacks = new Paginate.Callbacks() {
+                @Override
+                public void onLoadMore() {
+                    mPresenter.requestGanks(mTitle, false);
+                }
+
+                @Override
+                public boolean isLoading() {
+                    return isLoadingMore;
+                }
+
+                @Override
+                public boolean hasLoadedAllItems() {
+                    return false;
+                }
+            };
+            mPaginate = Paginate.with(mRecyclerView, callbacks)
+                    .setLoadingTriggerThreshold(0)
+                    .build();
+            mPaginate.setHasMoreDataToLoad(false);
+        }
     }
 
     @Override

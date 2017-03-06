@@ -34,7 +34,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile project(path: ':arms')
-    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.google.dagger:dagger:2.8'
     compile 'me.drakeet.multitype:multitype:2.4.2'
     compile 'com.github.bassaer:materialdesigncolors:1.0.0'
@@ -42,6 +42,7 @@ dependencies {
     compile 'com.ncapdevi:frag-nav:1.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.android.support:support-v4:25.2.0'
+    compile 'com.github.markomilos:paginate:0.5.1'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
