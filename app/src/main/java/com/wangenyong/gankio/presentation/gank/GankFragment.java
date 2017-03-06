@@ -60,6 +60,8 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
 
     @Override
     protected void setupFragmentComponent(AppComponent appComponent) {
+        isViewPrepared = true;
+
         this.mRxPermissions = new RxPermissions(mActivity);
         DaggerGankComponent
                 .builder()
@@ -85,7 +87,7 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
 
     @Override
     protected void initData() {
-        mPresenter.requestGanks(mTitle, true);
+        lazyLoad();
     }
 
     @Override
@@ -94,7 +96,13 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     }
 
     @Override
-    public void lazyLoad() {}
+    public void lazyLoad() {
+        if (!isVisible || !isViewPrepared || isDataLoaded) {
+            return;
+        }
+        mPresenter.requestGanks(mTitle, true);
+        isDataLoaded = true;
+    }
 
     @Override
     public void setAdapter(MultiTypeAdapter adapter) {
