@@ -51,7 +51,7 @@ public class GankFragmentContainer extends Fragment {
     }
 
     public class GankPagerAdapter extends FragmentStatePagerAdapter {
-        private final String[] titles = {"All", "Android", "iOS", "前端", "瞎推荐"};
+        private final String[] titles = {"all", "Android", "iOS", "前端", "瞎推荐"};
 
         public GankPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -59,7 +59,7 @@ public class GankFragmentContainer extends Fragment {
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new GankFragment();
+            Fragment fragment = GankFragment.newInstance(titles[i]);
             return fragment;
         }
 

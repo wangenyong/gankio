@@ -1,6 +1,7 @@
 package com.wangenyong.gankio.presentation.gank;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,10 +41,17 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
 
+    private static final String ARG_TITLE = "title";
+
+    private String mTitle;
+
     RxPermissions mRxPermissions;
 
-    public static GankFragment newInstance() {
+    public static GankFragment newInstance(String title) {
         GankFragment fragment = new GankFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_TITLE, title);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -56,6 +64,10 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
                 .gankModule(new GankModule(this))
                 .build()
                 .inject(this);
+
+        if (getArguments() != null) {
+            mTitle = getArguments().getString(ARG_TITLE);
+        }
     }
 
     @Override
@@ -69,7 +81,7 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
 
     @Override
     protected void initData() {
-        mPresenter.requestGanks(true);
+        mPresenter.requestGanks(mTitle, true);
     }
 
     @Override

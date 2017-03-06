@@ -46,6 +46,9 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
     private MultiTypeAdapter mAdapter;
     private List<Object> mGanks = new ArrayList<>();
 
+    private final int mCount = 10;
+    private int mPage = 1;
+
     @Inject
     public GankPresenter(GankContract.Model model, GankContract.View rootView
             , RxErrorHandler handler, Application application
@@ -61,7 +64,7 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
         mRootView.setAdapter(mAdapter);
     }
 
-    public void requestGanks(final boolean pullToRefresh) {
+    public void requestGanks(final String type, final boolean pullToRefresh) {
         //请求外部存储权限用于适配android6.0的权限管理机制
         PermissionUtil.externalStorage(new PermissionUtil.RequestPermission() {
             @Override
@@ -70,7 +73,7 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
             }
         }, mRootView.getRxPermissions(), mRootView, mErrorHandler);
 
-        Subscription subscription = mModel.getGanks("Android", 10, 1, true)
+        Subscription subscription = mModel.getGanks(type, mCount, mPage, pullToRefresh)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ErrorHandleSubscriber<List<Gank>>(mErrorHandler) {
