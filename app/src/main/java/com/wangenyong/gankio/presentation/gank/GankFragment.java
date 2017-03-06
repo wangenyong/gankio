@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jess.arms.utils.UiUtils;
+import com.tbruyelle.rxpermissions.RxPermissions;
 import com.wangenyong.gankio.R;
 import com.wangenyong.gankio.di.component.AppComponent;
 import com.wangenyong.gankio.di.component.DaggerGankComponent;
@@ -39,6 +40,8 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView mRecyclerView;
 
+    RxPermissions mRxPermissions;
+
     public static GankFragment newInstance() {
         GankFragment fragment = new GankFragment();
         return fragment;
@@ -46,6 +49,7 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
 
     @Override
     protected void setupFragmentComponent(AppComponent appComponent) {
+        this.mRxPermissions = new RxPermissions(mActivity);
         DaggerGankComponent
                 .builder()
                 .appComponent(appComponent)
@@ -75,6 +79,11 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     public void setAdapter(MultiTypeAdapter adapter) {
         mRecyclerView.setAdapter(adapter);
         initRecycleView();
+    }
+
+    @Override
+    public RxPermissions getRxPermissions() {
+        return mRxPermissions;
     }
 
     /**

@@ -5,6 +5,7 @@ import android.app.Application;
 import com.jess.arms.base.AppManager;
 import com.jess.arms.di.scope.ActivityScope;
 import com.jess.arms.mvp.BasePresenter;
+import com.jess.arms.utils.PermissionUtil;
 import com.jess.arms.widget.imageloader.ImageLoader;
 import com.wangenyong.gankio.model.entity.Gank;
 
@@ -15,9 +16,9 @@ import javax.inject.Inject;
 
 import me.drakeet.multitype.MultiTypeAdapter;
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
+import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
@@ -61,12 +62,20 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
     }
 
     public void requestGanks(final boolean pullToRefresh) {
+        //请求外部存储权限用于适配android6.0的权限管理机制
+        PermissionUtil.externalStorage(new PermissionUtil.RequestPermission() {
+            @Override
+            public void onRequestPermissionSuccess() {
+                //request permission success, do something.
+            }
+        }, mRootView.getRxPermissions(), mRootView, mErrorHandler);
+
         Subscription subscription = mModel.getGanks("Android", 10, 1, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<List<Gank>>() {
+                .subscribe(new ErrorHandleSubscriber<List<Gank>>(mErrorHandler) {
                     @Override
-                    public void call(List<Gank> ganks) {
+                    public void onNext(List<Gank> ganks) {
                         for (Gank gank: ganks) {
                             mGanks.add(gank);
                         }
@@ -75,6 +84,7 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
                     }
                 });
     }
+
 
     @Override
     public void onDestroy() {
