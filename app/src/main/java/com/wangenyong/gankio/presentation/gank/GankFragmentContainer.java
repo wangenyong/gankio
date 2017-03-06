@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -21,6 +21,8 @@ import butterknife.ButterKnife;
  * A simple {@link Fragment} subclass.
  */
 public class GankFragmentContainer extends Fragment {
+    protected final String TAG = this.getClass().getSimpleName();
+
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.tablayout_gank_container) TabLayout mTabLayout;
     @BindView(R.id.viewPager_gank_container) ViewPager mViewPager;
@@ -30,6 +32,13 @@ public class GankFragmentContainer extends Fragment {
     public GankFragmentContainer() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mGankPagerAdapter = new GankPagerAdapter(getChildFragmentManager());
+    }
+
 
 
     @Override
@@ -44,13 +53,12 @@ public class GankFragmentContainer extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mGankPagerAdapter = new GankPagerAdapter(getChildFragmentManager());
+        mViewPager.setOffscreenPageLimit(2);
         mViewPager.setAdapter(mGankPagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
     }
 
-    public class GankPagerAdapter extends FragmentStatePagerAdapter {
+    public class GankPagerAdapter extends FragmentPagerAdapter {
         private final String[] titles = {"all", "Android", "iOS", "前端", "瞎推荐"};
 
         public GankPagerAdapter(FragmentManager fm) {
@@ -71,6 +79,11 @@ public class GankFragmentContainer extends Fragment {
         @Override
         public CharSequence getPageTitle(int position) {
             return titles[position];
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+
         }
     }
 

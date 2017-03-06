@@ -17,7 +17,11 @@ import com.wangenyong.gankio.R;
 import com.wangenyong.gankio.di.component.AppComponent;
 import com.wangenyong.gankio.di.component.DaggerGankComponent;
 import com.wangenyong.gankio.di.module.GankModule;
+import com.wangenyong.gankio.model.entity.Gank;
 import com.wangenyong.gankio.presentation.base.AppFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import me.drakeet.multitype.MultiTypeAdapter;
@@ -50,6 +54,12 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     private boolean isLoadingMore;
     private Paginate mPaginate;
 
+    private MultiTypeAdapter mAdapter;
+    private List<Object> mGanks = new ArrayList<>();
+
+    private final int mCount = 20;
+    private int mPage = 1;
+
     public static GankFragment newInstance(String title) {
         GankFragment fragment = new GankFragment();
         Bundle args = new Bundle();
@@ -59,9 +69,15 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     }
 
     @Override
-    protected void setupFragmentComponent(AppComponent appComponent) {
-        isViewPrepared = true;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        mAdapter = new MultiTypeAdapter();
+        mAdapter.register(Gank.class, new GankItemViewProvider());
+    }
+
+    @Override
+    protected void setupFragmentComponent(AppComponent appComponent) {
         this.mRxPermissions = new RxPermissions(mActivity);
         DaggerGankComponent
                 .builder()
@@ -73,6 +89,8 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
         if (getArguments() != null) {
             mTitle = getArguments().getString(ARG_TITLE);
         }
+
+        initRecycleView();
     }
 
     @Override
@@ -83,6 +101,8 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     private void initRecycleView() {
         mRefreshLayout.setOnRefreshListener(this);
         UiUtils.configRecycleView(mRecyclerView, new LinearLayoutManager(mActivity));
+        mRecyclerView.setAdapter(mAdapter);
+        initPaginate();
     }
 
     @Override
@@ -92,23 +112,18 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
 
     @Override
     public void onRefresh() {
-        mPresenter.requestGanks(mTitle, true);
+        mPage = 1;
+        mPresenter.requestGanks(mTitle, mCount, mPage, true);
     }
 
     @Override
     public void lazyLoad() {
-        if (!isVisible || !isViewPrepared || isDataLoaded) {
+        if (isDataLoaded) {
             return;
         }
-        mPresenter.requestGanks(mTitle, true);
+        mPage = 1;
+        mPresenter.requestGanks(mTitle, mCount, mPage, true);
         isDataLoaded = true;
-    }
-
-    @Override
-    public void setAdapter(MultiTypeAdapter adapter) {
-        mRecyclerView.setAdapter(adapter);
-        initRecycleView();
-        initPaginate();
     }
 
     @Override
@@ -152,6 +167,25 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
     }
 
     @Override
+    public void showGanks(List<Gank> ganks) {
+        mGanks.clear();
+        for (Gank gank : ganks) {
+            mGanks.add(gank);
+        }
+        mAdapter.setItems(mGanks);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showMoreGanks(List<Gank> ganks) {
+        for (Gank gank : ganks) {
+            mGanks.add(gank);
+        }
+        mAdapter.setItems(mGanks);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void launchActivity(@NonNull Intent intent) {
         checkNotNull(intent);
         UiUtils.startActivity(intent);
@@ -172,7 +206,7 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
             Paginate.Callbacks callbacks = new Paginate.Callbacks() {
                 @Override
                 public void onLoadMore() {
-                    mPresenter.requestGanks(mTitle, false);
+                    mPresenter.requestGanks(mTitle, mCount, ++mPage, false);
                 }
 
                 @Override
@@ -191,6 +225,14 @@ public class GankFragment extends AppFragment<GankPresenter> implements GankCont
             mPaginate.setHasMoreDataToLoad(false);
         }
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPaginate.unbind();
+        mPaginate = null;
+    }
+
 
     @Override
     public void killMyself() {

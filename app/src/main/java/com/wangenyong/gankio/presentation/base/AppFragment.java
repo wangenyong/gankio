@@ -35,9 +35,7 @@ public abstract class AppFragment<P extends Presenter> extends BaseFragment<P> {
         }
     }
 
-    protected void onVisible(){
-        lazyLoad();
-    }
+    protected void onVisible(){}
     protected abstract void lazyLoad();
     protected void onInvisible(){}
 

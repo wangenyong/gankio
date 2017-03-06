@@ -10,12 +10,10 @@ import com.jess.arms.utils.RxUtils;
 import com.jess.arms.widget.imageloader.ImageLoader;
 import com.wangenyong.gankio.model.entity.Gank;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import me.drakeet.multitype.MultiTypeAdapter;
 import me.jessyan.rxerrorhandler.core.RxErrorHandler;
 import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber;
 import me.jessyan.rxerrorhandler.handler.RetryWithDelay;
@@ -23,6 +21,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 
 /**
@@ -46,12 +45,6 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
     private ImageLoader mImageLoader;
     private AppManager mAppManager;
 
-    private MultiTypeAdapter mAdapter;
-    private List<Object> mGanks = new ArrayList<>();
-
-    private final int mCount = 10;
-    private int mPage = 1;
-
     @Inject
     public GankPresenter(GankContract.Model model, GankContract.View rootView
             , RxErrorHandler handler, Application application
@@ -61,13 +54,9 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
         this.mApplication = application;
         this.mImageLoader = imageLoader;
         this.mAppManager = appManager;
-
-        mAdapter = new MultiTypeAdapter();
-        mAdapter.register(Gank.class, new GankItemViewProvider());
-        mRootView.setAdapter(mAdapter);
     }
 
-    public void requestGanks(final String type, final boolean pullToRefresh) {
+    public void requestGanks(final String type, final int count, final int page, final boolean pullToRefresh) {
         //请求外部存储权限用于适配android6.0的权限管理机制
         PermissionUtil.externalStorage(new PermissionUtil.RequestPermission() {
             @Override
@@ -76,7 +65,7 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
             }
         }, mRootView.getRxPermissions(), mRootView, mErrorHandler);
 
-        Subscription subscription = mModel.getGanks(type, mCount, mPage, pullToRefresh)
+        Subscription subscription = mModel.getGanks(type, count, page, pullToRefresh)
                 .subscribeOn(Schedulers.io())
                 .retryWhen(new RetryWithDelay(3, 2))
                 .doOnSubscribe(new Action0() {
@@ -106,25 +95,19 @@ public class GankPresenter extends BasePresenter<GankContract.Model, GankContrac
                     @Override
                     public void onNext(List<Gank> ganks) {
                         if (pullToRefresh) {
-                            mGanks.clear();
-                            mPage = 1;
+                            mRootView.showGanks(ganks);
                         } else {
-                            mPage++;
+                            mRootView.showMoreGanks(ganks);
                         }
-                        for (Gank gank: ganks) {
-                            mGanks.add(gank);
-                        }
-                        mAdapter.setItems(mGanks);
-                        mAdapter.notifyDataSetChanged();
                     }
                 });
         addSubscribe(subscription);
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Timber.d("onDestroy");
         this.mErrorHandler = null;
         this.mAppManager = null;
         this.mImageLoader = null;
